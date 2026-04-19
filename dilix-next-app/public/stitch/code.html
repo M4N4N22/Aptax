@@ -1,0 +1,359 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .ghost-border {
+      border: 1px solid rgba(71, 71, 71, 0.15);
+    }
+    .surface-glow {
+      box-shadow: 0 0 32px 4px rgba(198, 198, 199, 0.04);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, #d4d4d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed": "#1a1b22",
+            "surface-container": "#1f1f1f",
+            "tertiary-container": "#909193",
+            "on-background": "#e2e2e2",
+            "on-surface-variant": "#c6c6c6",
+            "secondary-container": "#45464e",
+            "inverse-surface": "#e2e2e2",
+            "surface": "#131313",
+            "primary-container": "#d4d4d4",
+            "error-container": "#93000a",
+            "on-tertiary": "#1a1c1e",
+            "on-tertiary-container": "#000000",
+            "secondary-fixed-dim": "#aaaab3",
+            "inverse-primary": "#5d5f5f",
+            "on-tertiary-fixed": "#ffffff",
+            "surface-bright": "#393939",
+            "on-primary-fixed-variant": "#e2e2e2",
+            "primary": "#ffffff",
+            "primary-fixed": "#5d5f5f",
+            "error": "#ffb4ab",
+            "tertiary": "#e2e2e5",
+            "surface-container-high": "#2a2a2a",
+            "secondary": "#c6c6cf",
+            "surface-container-highest": "#353535",
+            "on-error": "#690005",
+            "surface-variant": "#353535",
+            "surface-container-lowest": "#0e0e0e",
+            "tertiary-fixed-dim": "#454749",
+            "surface-tint": "#c6c6c7",
+            "primary-fixed-dim": "#454747",
+            "on-tertiary-fixed-variant": "#e2e2e5",
+            "tertiary-fixed": "#5d5e61",
+            "outline": "#919191",
+            "background": "#131313",
+            "on-error-container": "#ffdad6",
+            "surface-container-low": "#1b1b1b",
+            "on-secondary": "#1a1b22",
+            "on-secondary-fixed-variant": "#3a3b42",
+            "inverse-on-surface": "#303030",
+            "on-primary": "#1a1c1c",
+            "outline-variant": "#474747",
+            "on-primary-container": "#000000",
+            "on-secondary-container": "#e2e1eb",
+            "surface-dim": "#131313",
+            "on-surface": "#e2e2e2",
+            "on-primary-fixed": "#ffffff",
+            "secondary-fixed": "#c6c6cf"
+          },
+          "borderRadius": {
+            "DEFAULT": "0px",
+            "lg": "0px",
+            "xl": "0px",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Manrope", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "label": ["Space Grotesk", "monospace"]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 max-w-none bg-[#131313] border-b border-[#474747]/15">
+<div class="text-xl font-black tracking-tighter text-[#ffffff] uppercase font-headline">
+      Aptax
+    </div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-[#ffffff] border-b-2 border-[#ffffff] pb-1 font-headline tracking-tighter uppercase text-sm font-bold transition-colors duration-200" href="#">Platform</a>
+<a class="text-[#c6c6c6] font-medium font-headline tracking-tighter uppercase text-sm font-bold hover:text-[#ffffff] transition-colors duration-200" href="#">Solutions</a>
+<a class="text-[#c6c6c6] font-medium font-headline tracking-tighter uppercase text-sm font-bold hover:text-[#ffffff] transition-colors duration-200" href="#">Developers</a>
+<a class="text-[#c6c6c6] font-medium font-headline tracking-tighter uppercase text-sm font-bold hover:text-[#ffffff] transition-colors duration-200" href="#">Docs</a>
+</div>
+<button class="bg-primary text-on-primary px-5 py-2 font-headline tracking-tighter uppercase text-sm font-bold active:scale-95 duration-100 transition-colors hover:bg-primary-container">
+      Connect
+    </button>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="px-6 py-20 md:py-32 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div class="space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low border border-outline-variant/20">
+<span class="w-2 h-2 bg-primary animate-pulse"></span>
+<span class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">Infrastructure Grade Verification</span>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter leading-[0.9] text-gradient">
+          Verify sensitive claims without exposing raw data.
+        </h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-xl leading-relaxed">
+          Aptax is a confidential verification infrastructure layer powered by Fhenix. It gives apps, agents, and workflows a new way to verify conditions against private data.
+        </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="bg-primary text-on-primary px-8 py-4 font-headline tracking-tighter uppercase font-bold text-sm">Explore Aptax</button>
+<button class="border border-outline px-8 py-4 font-headline tracking-tighter uppercase font-bold text-sm hover:bg-surface-container-low transition-colors">Read Docs</button>
+</div>
+</div>
+<!-- Monolithic Visual -->
+<div class="relative group">
+<div class="absolute -inset-4 bg-surface-tint/5 blur-3xl rounded-full transition-opacity group-hover:opacity-100 opacity-50"></div>
+<div class="relative bg-surface-container-lowest border border-outline-variant/10 p-8 h-[500px] flex flex-col justify-center items-center space-y-12 surface-glow">
+<!-- Flow Visualization -->
+<div class="w-full max-w-md space-y-6">
+<div class="flex justify-between items-center opacity-40">
+<span class="font-label text-[10px] uppercase tracking-widest">Input: Encrypted State</span>
+<span class="material-symbols-outlined text-sm">lock</span>
+</div>
+<div class="h-px bg-gradient-to-r from-transparent via-outline-variant to-transparent"></div>
+<div class="bg-surface-container-high p-6 border border-primary/10 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent"></div>
+<div class="relative z-10 flex flex-col items-center gap-4">
+<div class="font-label text-[10px] uppercase text-primary tracking-widest border border-primary/20 px-3 py-1">Aptax Compute</div>
+<div class="text-center font-headline font-bold text-2xl tracking-tighter">CONFIDENTIAL EVALUATION</div>
+</div>
+</div>
+<div class="h-px bg-gradient-to-r from-transparent via-outline-variant to-transparent"></div>
+<div class="flex justify-between items-center text-primary">
+<span class="font-label text-[10px] uppercase tracking-widest">Output: Bounded Result</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span class="font-label text-xs">TRUE</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Callouts Grid -->
+<section class="px-6 py-12 border-y border-outline-variant/10 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="space-y-2">
+<span class="material-symbols-outlined text-primary mb-2">api</span>
+<div class="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">Verification</div>
+<div class="font-headline font-bold text-sm uppercase tracking-tighter">API</div>
+</div>
+<div class="space-y-2">
+<span class="material-symbols-outlined text-primary mb-2">terminal</span>
+<div class="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">Developer</div>
+<div class="font-headline font-bold text-sm uppercase tracking-tighter">SDK</div>
+</div>
+<div class="space-y-2">
+<span class="material-symbols-outlined text-primary mb-2">hub</span>
+<div class="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">Universal</div>
+<div class="font-headline font-bold text-sm uppercase tracking-tighter">MCP Server</div>
+</div>
+<div class="space-y-2">
+<span class="material-symbols-outlined text-primary mb-2">bolt</span>
+<div class="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">Agentic</div>
+<div class="font-headline font-bold text-sm uppercase tracking-tighter">Aptax Skill</div>
+</div>
+</div>
+</section>
+<!-- The Problem & The Shift -->
+<section class="px-6 py-32 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24">
+<div class="space-y-6">
+<div class="font-label text-xs uppercase tracking-[0.3em] text-error mb-4">The Problem</div>
+<h2 class="font-headline text-4xl font-extrabold tracking-tighter">Software still verifies by overexposing.</h2>
+<p class="text-on-surface-variant text-lg leading-relaxed">
+          Most systems can only validate sensitive information by revealing it first. That approach slows workflows, widens access, and creates unnecessary trust assumptions across apps, agents, and teams.
+        </p>
+</div>
+<div class="space-y-6 bg-surface-container-low p-8 border border-outline-variant/10">
+<div class="font-label text-xs uppercase tracking-[0.3em] text-primary mb-4">The Shift</div>
+<h2 class="font-headline text-4xl font-extrabold tracking-tighter text-gradient">A better interface to private information.</h2>
+<p class="text-on-surface-variant text-lg leading-relaxed">
+          Aptax replaces raw data access with bounded verification. Instead of exposing the secret, software can ask a specific question and receive only the answer it needs.
+        </p>
+</div>
+</section>
+<!-- Product Surfaces (Bento Grid) -->
+<section class="px-6 py-32 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto">
+<div class="mb-16">
+<h2 class="font-headline text-5xl font-extrabold tracking-tighter mb-4">Infrastructure Surfaces</h2>
+<div class="h-1 w-20 bg-primary"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- API -->
+<div class="md:col-span-7 bg-surface p-10 border border-outline-variant/10 flex flex-col justify-between h-[400px]">
+<div>
+<span class="material-symbols-outlined text-3xl mb-6">api</span>
+<h3 class="font-headline text-3xl font-bold tracking-tighter mb-4">Verification API</h3>
+<p class="text-on-surface-variant max-w-md">A clean API for requesting confidential checks inside apps, platforms, and internal systems.</p>
+</div>
+<div class="font-label text-[11px] bg-surface-container-low p-4 text-on-surface-variant border border-outline-variant/20 overflow-hidden whitespace-nowrap">
+<span class="text-primary">POST</span> /v1/verify { "claim": "credit_score &gt; 700", "id": "user_4921" }
+            </div>
+</div>
+<!-- SDK -->
+<div class="md:col-span-5 bg-surface-container-low p-10 border border-outline-variant/10 flex flex-col justify-between h-[400px]">
+<div>
+<span class="material-symbols-outlined text-3xl mb-6">terminal</span>
+<h3 class="font-headline text-3xl font-bold tracking-tighter mb-4">Developer SDK</h3>
+<p class="text-on-surface-variant">Aptax SDKs make it easy to encrypt metrics, create verification requests, and handle permissions.</p>
+</div>
+<div class="font-label text-[11px] text-on-surface-variant opacity-60">
+              npm install @aptax/sdk-core
+            </div>
+</div>
+<!-- MCP -->
+<div class="md:col-span-5 bg-surface-container-low p-10 border border-outline-variant/10 flex flex-col justify-between h-[400px]">
+<div>
+<span class="material-symbols-outlined text-3xl mb-6">hub</span>
+<h3 class="font-headline text-3xl font-bold tracking-tighter mb-4">MCP Server</h3>
+<p class="text-on-surface-variant">Expose Aptax as agent-callable tools inside modern AI environments. Let models verify claims without touching data.</p>
+</div>
+<div class="flex gap-2">
+<div class="w-2 h-2 rounded-full bg-primary pulse"></div>
+<span class="font-label text-[10px] uppercase tracking-widest opacity-50">Active Connection</span>
+</div>
+</div>
+<!-- Skill -->
+<div class="md:col-span-7 bg-surface p-10 border border-outline-variant/10 flex flex-col justify-between h-[400px]">
+<div>
+<span class="material-symbols-outlined text-3xl mb-6">bolt</span>
+<h3 class="font-headline text-3xl font-bold tracking-tighter mb-4">Aptax Skill</h3>
+<p class="text-on-surface-variant max-w-md">Install Aptax into coding assistants and developer workflows to scaffold integrations and build flows faster.</p>
+</div>
+<div class="flex items-center gap-4">
+<img class="w-16 h-16 grayscale border border-outline-variant/20" data-alt="close-up of a high-resolution laptop screen showing clean organized code with syntax highlighting in a dark studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSv8NXFK1qP79KguSCMZKuESlPHKblVk9joThAVMo_OD0xEilpK5-uOuG-4Vqt9Q-OPHBuuYGrh3bByYLso1cjjWFFWyWCcUg25Xu_PbM1x8XGxu5n7JQzVN0uAfkV-p3xF8bplOhm2sch8bRKTL0GBY170kZ9fuqYF2NwWEsv-QH-GjgR8TXyH2ltbJqpGzo-bkw1iHfJOSMPFDvkwo2lBoWpg7EaU6_fqzb94fhnmj96W3Tlaa9IZBfX-tgHhvDvz2w0apUWTsh6"/>
+<span class="font-label text-xs uppercase tracking-widest opacity-50">Integrated Ecosystem</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- How it Works -->
+<section class="px-6 py-32 max-w-4xl mx-auto text-center">
+<h2 class="font-headline text-5xl font-extrabold tracking-tighter mb-8 text-gradient">Encrypted in. Verified out.</h2>
+<p class="text-on-surface-variant text-xl leading-relaxed mb-16">
+        Private data is encrypted at the source. Aptax evaluates verification requests against that encrypted state and returns only the bounded result. No raw numbers. No full disclosure. No unnecessary access.
+      </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="p-8 border border-outline-variant/10 bg-surface-container-low text-left">
+<div class="font-label text-primary text-2xl mb-4 font-bold">01</div>
+<h4 class="font-headline font-bold text-lg mb-2">Encryption</h4>
+<p class="text-sm text-on-surface-variant">Data is masked at the source before any transmission occurs.</p>
+</div>
+<div class="p-8 border border-outline-variant/10 bg-surface-container-low text-left">
+<div class="font-label text-primary text-2xl mb-4 font-bold">02</div>
+<h4 class="font-headline font-bold text-lg mb-2">Computation</h4>
+<p class="text-sm text-on-surface-variant">Confidential verification runs on the Fhenix layer.</p>
+</div>
+<div class="p-8 border border-outline-variant/10 bg-surface-container-low text-left">
+<div class="font-label text-primary text-2xl mb-4 font-bold">03</div>
+<h4 class="font-headline font-bold text-lg mb-2">Resolution</h4>
+<p class="text-sm text-on-surface-variant">Only the verified answer is released to the caller.</p>
+</div>
+</div>
+</section>
+<!-- Why Now -->
+<section class="px-6 py-32 bg-surface-container-low relative overflow-hidden">
+<div class="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 transform translate-x-1/2"></div>
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-16 items-center relative z-10">
+<div class="md:w-1/2">
+<h2 class="font-headline text-5xl font-extrabold tracking-tighter leading-tight mb-8">Intelligent systems need a new trust layer.</h2>
+<p class="text-on-surface-variant text-xl leading-relaxed">
+            As AI agents and programmable workflows become more autonomous, they also require more context, more permissions, and more access. Aptax gives modern systems a safer way to act on sensitive information without holding the information itself.
+          </p>
+</div>
+<div class="md:w-1/2 grid grid-cols-2 gap-4">
+<div class="aspect-square bg-surface border border-outline-variant/10 p-6 flex flex-col justify-end">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Context</span>
+<div class="font-headline font-bold text-xl">Privacy First</div>
+</div>
+<div class="aspect-square bg-surface border border-outline-variant/10 p-6 flex flex-col justify-end">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Agency</span>
+<div class="font-headline font-bold text-xl">Permissionless</div>
+</div>
+<div class="aspect-square bg-surface border border-outline-variant/10 p-6 flex flex-col justify-end">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Security</span>
+<div class="font-headline font-bold text-xl">No Leakage</div>
+</div>
+<div class="aspect-square bg-surface border border-outline-variant/10 p-6 flex flex-col justify-end">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Speed</span>
+<div class="font-headline font-bold text-xl">Real-time</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Powered by Fhenix -->
+<section class="px-6 py-24 border-y border-outline-variant/10">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+<div class="flex flex-col gap-4">
+<div class="font-label text-xs uppercase tracking-[0.4em] text-on-surface-variant">Core Technology</div>
+<h3 class="font-headline text-3xl font-black tracking-tighter uppercase italic">Fhenix Enabled</h3>
+</div>
+<div class="md:max-w-xl">
+<p class="text-on-surface-variant leading-relaxed">
+            Aptax is built on Fhenix and encrypted computation primitives that make confidential verification possible at the infrastructure layer. We leverage the power of FHE to ensure data remains sovereign even during processing.
+          </p>
+</div>
+</div>
+</section>
+<!-- Platform Vision & Final CTA -->
+<section class="px-6 py-40 max-w-7xl mx-auto text-center">
+<div class="bg-surface-container-high p-20 border border-primary/10 relative group surface-glow">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent opacity-50"></div>
+<div class="relative z-10 space-y-10">
+<h2 class="font-headline text-5xl md:text-7xl font-black tracking-tighter leading-none">Build with confidential verification from day one.</h2>
+<p class="text-on-surface-variant text-xl max-w-2xl mx-auto">
+            Use Aptax through API, SDK, MCP, or Aptax Skill and give your systems a safer way to verify what matters.
+          </p>
+<div class="flex flex-wrap justify-center gap-6">
+<button class="bg-primary text-on-primary px-10 py-5 font-headline tracking-tighter uppercase font-extrabold text-sm active:scale-95 duration-100 transition-all hover:bg-primary-container">Explore Aptax</button>
+<button class="border border-outline px-10 py-5 font-headline tracking-tighter uppercase font-extrabold text-sm hover:bg-surface-container-lowest transition-all">View Platform</button>
+<button class="font-label text-xs uppercase tracking-widest border-b border-outline-variant pb-1 hover:border-primary transition-colors">Read the docs</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-start gap-8 bg-[#0e0e0e] border-t border-[#474747]/15">
+<div class="space-y-4">
+<div class="text-lg font-black tracking-tighter text-[#ffffff] font-headline">APTAX</div>
+<p class="font-label text-[10px] tracking-widest uppercase text-[#919191]">
+        © 2024 Aptax Infrastructure. Sovereign Monolith Grade.
+      </p>
+</div>
+<div class="flex flex-wrap gap-x-8 gap-y-4">
+<a class="font-space-grotesk text-[10px] tracking-widest uppercase text-[#919191] hover:text-[#ffffff] underline decoration-1 transition-all duration-300" href="#">API</a>
+<a class="font-space-grotesk text-[10px] tracking-widest uppercase text-[#919191] hover:text-[#ffffff] underline decoration-1 transition-all duration-300" href="#">SDK</a>
+<a class="font-space-grotesk text-[10px] tracking-widest uppercase text-[#919191] hover:text-[#ffffff] underline decoration-1 transition-all duration-300" href="#">MCP</a>
+<a class="font-space-grotesk text-[10px] tracking-widest uppercase text-[#919191] hover:text-[#ffffff] underline decoration-1 transition-all duration-300" href="#">Skills</a>
+<a class="font-space-grotesk text-[10px] tracking-widest uppercase text-[#919191] hover:text-[#ffffff] underline decoration-1 transition-all duration-300" href="#">Fhenix Partnership</a>
+</div>
+</footer>
+</body></html>
