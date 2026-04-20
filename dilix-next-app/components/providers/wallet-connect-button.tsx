@@ -20,7 +20,7 @@ export function WalletConnectButton() {
 
         if (!connected) {
           return (
-            <Button variant="default" size="sm" onClick={openConnectModal}>
+            <Button variant="default"  onClick={openConnectModal}>
               Connect wallet
             </Button>
           );
@@ -28,14 +28,14 @@ export function WalletConnectButton() {
 
         if (chain.unsupported) {
           return (
-            <Button variant="secondary" size="sm" onClick={openChainModal}>
+            <Button variant="secondary" onClick={openChainModal}>
               Switch network
             </Button>
           );
         }
 
         return (
-          <Button variant="secondary" size="sm" onClick={openAccountModal}>
+          <Button variant="secondary"  onClick={openAccountModal}>
             {account.displayName}
           </Button>
         );
