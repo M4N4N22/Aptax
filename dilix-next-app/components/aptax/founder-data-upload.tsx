@@ -51,6 +51,12 @@ type UploadMetricStatus = UploadMetricDefinition & {
   updatedAt?: bigint;
 };
 
+type MetricRecord = {
+  handle: `0x${string}`;
+  isSet: boolean;
+  updatedAt: bigint;
+};
+
 const metricDefinitions: UploadMetricDefinition[] = [
   {
     slug: "mrr",
@@ -172,7 +178,7 @@ export function FounderDataUpload({ profile }: { profile: DilixFounderProfile })
           abi: aptaxVerifierViemAbi,
           functionName: "getMetricRecordForKey",
           args: [subjectId as `0x${string}`, metricKey as `0x${string}`],
-        });
+        }) as MetricRecord;
 
         return {
           ...metric,

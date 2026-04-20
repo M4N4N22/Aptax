@@ -1,10 +1,7 @@
 "use client";
 
-import { WagmiAdapter } from "@cofhe/sdk/adapters";
-import { arbSepolia, baseSepolia, hardhat, localcofhe, sepolia } from "@cofhe/sdk/chains";
-import { createCofheClient, createCofheConfig } from "@cofhe/sdk/web";
-import { ethers } from "ethers";
 import type { PublicClient, WalletClient } from "viem";
+import { keccak256, toBytes } from "viem";
 
 import type {
   AptaxMetricOperator,
@@ -20,20 +17,16 @@ export const diligenceMetricSlugs = [
   "customer_concentration_bps",
 ] as const satisfies readonly AptaxMetricSlug[];
 
-const chainById = {
-  31337: hardhat,
-  42069: localcofhe,
-  11155111: sepolia,
-  421614: arbSepolia,
-  84532: baseSepolia,
-} as const;
-
 export type AptaxWalletSessionInput = {
   account?: `0x${string}`;
   chainId?: number;
   publicClient?: PublicClient;
   walletClient?: WalletClient;
 };
+
+type CofheBrowserClient = Awaited<
+  ReturnType<(typeof import("@cofhe/sdk/web"))["createCofheClient"]>
+>;
 
 export type AptaxBrowserSession = {
   account: `0x${string}`;
@@ -43,7 +36,7 @@ export type AptaxBrowserSession = {
   registryAddress: `0x${string}`;
   metricStoreAddress: `0x${string}`;
   verifierAddress: `0x${string}`;
-  cofheClient: Awaited<ReturnType<typeof createCofheClient>>;
+  cofheClient: CofheBrowserClient;
 };
 
 export async function createAptaxBrowserSession(
@@ -65,6 +58,21 @@ export async function createAptaxBrowserSession(
       `Switch your wallet to network ${config.networkChainId} before interacting with the Aptax contracts.`
     );
   }
+
+  const [{ WagmiAdapter }, { arbSepolia, baseSepolia, hardhat, localcofhe, sepolia }, { createCofheClient, createCofheConfig }] =
+    await Promise.all([
+      import("@cofhe/sdk/adapters"),
+      import("@cofhe/sdk/chains"),
+      import("@cofhe/sdk/web"),
+    ]);
+
+  const chainById = {
+    31337: hardhat,
+    42069: localcofhe,
+    11155111: sepolia,
+    421614: arbSepolia,
+    84532: baseSepolia,
+  } as const;
 
   const cofheChain = chainById[config.networkChainId as keyof typeof chainById];
   if (!cofheChain) {
@@ -103,7 +111,7 @@ export function makeSubjectId(slug: string) {
   if (!normalized) {
     throw new Error("Enter a startup slug before creating a subject.");
   }
-  return ethers.id(`startup:${normalized}`);
+  return keccak256(toBytes(`startup:${normalized}`));
 }
 
 export function makeMetricKey(metricSlug: AptaxMetricSlug | string) {
@@ -112,7 +120,7 @@ export function makeMetricKey(metricSlug: AptaxMetricSlug | string) {
     throw new Error("Enter a metric key before storing or verifying a diligence metric.");
   }
 
-  return ethers.id(normalized);
+  return keccak256(toBytes(normalized));
 }
 
 export function parseUnsignedBigInt(value: string, label: string) {

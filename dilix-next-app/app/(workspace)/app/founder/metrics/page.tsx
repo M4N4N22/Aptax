@@ -120,7 +120,6 @@ export default async function FounderMetricsPage() {
   return (
     <div className="space-y-6">
       <WorkspacePageHeader
-        eyebrow={profile.startupName}
         title="Data room"
         description="Manage the company data that supports diligence and verification requests."
         actions={

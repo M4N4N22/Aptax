@@ -21,12 +21,12 @@ export default async function InvestorRequestsPage() {
   return (
     <div className="space-y-6">
       <WorkspacePageHeader
-        eyebrow="Investor module"
+      
         title="Diligence requests"
         description="A clean investor-first queue for the checks you are creating and monitoring. This removes the old shared queue feeling and keeps requests inside the investor workspace."
       />
 
-      <SectionCard eyebrow="Request queue" title="Recent investor-side activity">
+      <SectionCard title="Recent investor-side activity">
         {snapshot.requests.length === 0 ? (
           <EmptyState message="No investor requests are visible yet. Once bounded checks are created, they will accumulate here in a focused investor queue." />
         ) : (

@@ -1,3 +1,5 @@
+import { ButtonLink } from "@/components/landing/button-link";
+
 type FlagshipStep = {
   label: string;
   title: string;
@@ -26,6 +28,11 @@ export function MonolithFlagshipApplication({
             the underlying numbers. Investors request verification of a
             specific claim and receive only the bounded result.
           </p>
+          <div className="mt-8">
+            <ButtonLink href="/app" variant="primary">
+              Open Dilix app
+            </ButtonLink>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">

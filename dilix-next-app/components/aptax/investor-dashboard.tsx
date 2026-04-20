@@ -152,7 +152,7 @@ export function InvestorDashboard({ profile }: { profile?: DilixInvestorProfile 
   return (
     <div className="space-y-6">
       <WorkspacePageHeader
-        eyebrow="Investor workflow"
+     
         title={
           profile?.firmName
             ? `${profile.firmName} investor workspace`
@@ -198,7 +198,7 @@ export function InvestorDashboard({ profile }: { profile?: DilixInvestorProfile 
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <SectionCard eyebrow="Session" title="Investor session and result spotlight">
+        <SectionCard  title="Investor session and result spotlight">
           <div className="flex flex-wrap items-center gap-3">
             <StatusBadge
               label={address ? abbreviateAddress(address) : "not connected"}
@@ -241,7 +241,7 @@ export function InvestorDashboard({ profile }: { profile?: DilixInvestorProfile 
           </div>
         </SectionCard>
 
-        <SectionCard eyebrow="Request builder" title="Create a threshold verification request">
+        <SectionCard  title="Create a threshold verification request">
           <div className="grid gap-4">
             <label className="grid gap-2 text-sm">
               <span className="text-sm font-[510] text-[#62666d]">Startup subject</span>
@@ -297,7 +297,7 @@ export function InvestorDashboard({ profile }: { profile?: DilixInvestorProfile 
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <SectionCard eyebrow="Request history" title="Recent requests for the selected startup">
+        <SectionCard  title="Recent requests for the selected startup">
           {!subjectId ? (
             <EmptyState message="Choose a startup subject to inspect its verification history." />
           ) : requests.length === 0 ? (
@@ -330,7 +330,7 @@ export function InvestorDashboard({ profile }: { profile?: DilixInvestorProfile 
           )}
         </SectionCard>
 
-        <SectionCard eyebrow="Diligence notes" title="Investor-side queue and boundaries">
+        <SectionCard  title="Investor-side queue and boundaries">
           <div className="grid gap-3">
             <div className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4">
               <div className="flex items-center justify-between gap-3">
