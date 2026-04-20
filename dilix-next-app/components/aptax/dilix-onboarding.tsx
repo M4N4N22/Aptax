@@ -137,19 +137,19 @@ function isDraftComplete(role: DilixRole | null, founder: DilixFounderDraft, inv
   if (role === "founder") {
     return Boolean(
       founder.fullName.trim() &&
-        founder.startupName.trim() &&
-        founder.startupStage.trim() &&
-        founder.startupCategory.trim() &&
-        founder.roleAtCompany.trim()
+      founder.startupName.trim() &&
+      founder.startupStage.trim() &&
+      founder.startupCategory.trim() &&
+      founder.roleAtCompany.trim()
     );
   }
 
   if (role === "investor") {
     return Boolean(
       investor.fullName.trim() &&
-        investor.firmName.trim() &&
-        investor.investorType.trim() &&
-        investor.roleAtFirm.trim()
+      investor.firmName.trim() &&
+      investor.investorType.trim() &&
+      investor.roleAtFirm.trim()
     );
   }
 
@@ -201,26 +201,20 @@ export function DilixOnboarding() {
   };
 
   return (
-    <main className="min-h-screen bg-[#08090a] px-5 py-8 text-[#f7f8f8] sm:px-8 lg:px-10">
+    <main className="min-h-screen  px-5 py-8 text-text sm:px-8 lg:px-10">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col gap-6 lg:grid lg:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-[32px] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-8 lg:p-10">
+        <section className=" border-r border-foreground/5  p-6 sm:p-8 lg:p-10">
           <div className="flex items-center gap-3 text-sm text-[#8a8f98]">
-            <span className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-3 py-1">
-              Dilix by Aptax
-            </span>
-            <span>Private diligence workspaces</span>
           </div>
 
-          <div className="mt-8 space-y-5">
-            <h1 className="max-w-xl text-[2.6rem] font-[510] leading-[0.98] tracking-[-0.05em] text-[#f7f8f8] sm:text-[3.6rem]">
-              Start with a workspace that fits how you run diligence.
-            </h1>
-            <p className="max-w-xl text-[1rem] leading-7 text-[#8a8f98] sm:text-[1.05rem]">
-              Dilix sets up a focused workspace for founders and investors from the first visit, so the product feels intentional instead of generic.
-            </p>
-          </div>
+          <h1 className="max-w-xl text-[2.6rem] font-[510] leading-[0.98] tracking-[-0.05em] text-[#f7f8f8] sm:text-[3.6rem]">
+            Let’s set up your workspace
+          </h1>
+          <p className="max-w-xl text-sm leading-7 text-[#8a8f98] sm:text-[1.05rem] mt-2">
+            Choose your role and a few details to get a workspace that fits the way you work.
+          </p>
 
-          <div className="mt-8 grid gap-4">
+          <div className="mt-8 grid gap-8">
             {[
               {
                 icon: ShieldCheck,
@@ -243,10 +237,10 @@ export function DilixOnboarding() {
               return (
                 <div
                   key={item.title}
-                  className="rounded-[24px] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.025)] p-5"
+                  className="rounded-[24px] "
                 >
                   <div className="flex items-start gap-4">
-                    <span className="grid h-11 w-11 place-items-center rounded-2xl border border-[rgba(113,112,255,0.28)] bg-[rgba(113,112,255,0.12)] text-[#cfd2ff]">
+                    <span className="grid h-11 w-11 place-items-center text-[#cfd2ff]">
                       <Icon className="h-5 w-5" />
                     </span>
                     <div>
@@ -260,7 +254,7 @@ export function DilixOnboarding() {
           </div>
         </section>
 
-        <section className="rounded-[32px] border border-[rgba(255,255,255,0.08)] bg-[#101112] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] sm:p-8 lg:p-10">
+        <section className="rounded-[32px]  p-6 bg-foreground/2 sm:p-8 lg:p-10">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-[510] text-[#d0d6e0]">Workspace setup</p>
@@ -272,11 +266,10 @@ export function DilixOnboarding() {
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
                 onClick={() => setRole(null)}
-                className="rounded-xl text-[#d0d6e0]"
+                className=""
               >
-                <ChevronLeft className="mr-2 h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" />
                 Change role
               </Button>
             ) : null}
@@ -287,12 +280,12 @@ export function DilixOnboarding() {
               <button
                 type="button"
                 onClick={() => setRole("founder")}
-                className="rounded-[24px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.025)] p-5 text-left transition hover:border-[rgba(113,112,255,0.28)] hover:bg-[rgba(113,112,255,0.08)]"
+                className="rounded-[24px]  bg-[rgba(255,255,255,0.025)] p-5 text-left transition hover:border-[rgba(113,112,255,0.28)] hover:bg-[rgba(113,112,255,0.08)]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-3">
-                      <span className="grid h-11 w-11 place-items-center rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
+                      <span className="grid h-11 w-11 place-items-center rounded-2xl  bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
                         <Building2 className="h-5 w-5" />
                       </span>
                       <div>
@@ -311,12 +304,12 @@ export function DilixOnboarding() {
               <button
                 type="button"
                 onClick={() => setRole("investor")}
-                className="rounded-[24px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.025)] p-5 text-left transition hover:border-[rgba(113,112,255,0.28)] hover:bg-[rgba(113,112,255,0.08)]"
+                className="rounded-[24px]  bg-[rgba(255,255,255,0.025)] p-5 text-left transition hover:border-[rgba(113,112,255,0.28)] hover:bg-[rgba(113,112,255,0.08)]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-3">
-                      <span className="grid h-11 w-11 place-items-center rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
+                      <span className="grid h-11 w-11 place-items-center rounded-2xl  bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
                         <BriefcaseBusiness className="h-5 w-5" />
                       </span>
                       <div>

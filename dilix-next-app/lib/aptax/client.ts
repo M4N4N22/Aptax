@@ -230,6 +230,37 @@ export async function storeFounderMetric(
   };
 }
 
+export async function decryptFounderMetricForView(
+  session: AptaxBrowserSession,
+  subjectId: string,
+  metricSlug: AptaxMetricSlug
+) {
+  const metricKey = makeMetricKey(metricSlug);
+  const metricRecord =
+    metricSlug === "mrr"
+      ? await getMetricRecord(session.publicClient, session.verifierAddress, subjectId)
+      : await getMetricRecordForKey(
+          session.publicClient,
+          session.verifierAddress,
+          subjectId,
+          metricKey
+        );
+
+  if (!metricRecord.isSet) {
+    throw new Error("This metric has not been uploaded yet.");
+  }
+
+  const founderOnlyValue = await session.cofheClient
+    .decryptForView(metricRecord.handle, FheTypes.Uint64)
+    .execute();
+
+  return {
+    metricKey,
+    founderOnlyValue,
+    updatedAt: metricRecord.updatedAt,
+  };
+}
+
 export async function requestThresholdVerification(
   session: AptaxBrowserSession,
   subjectId: string,

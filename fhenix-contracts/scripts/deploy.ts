@@ -1,5 +1,7 @@
 import hre from "hardhat";
 
+import { syncDilixApp } from "./sync-dilix-app";
+
 async function main() {
   const registryFactory = await hre.ethers.getContractFactory("AptaxRegistry");
   const registry = await registryFactory.deploy();
@@ -19,11 +21,13 @@ async function main() {
 
   const deployment = {
     network: hre.network.name,
+    chainId: Number(hre.network.config.chainId ?? 0),
     registry: await registry.getAddress(),
     metricStore: await metricStore.getAddress(),
     verifier: await verifier.getAddress(),
   };
 
+  await syncDilixApp(deployment);
   console.log(JSON.stringify(deployment, null, 2));
 }
 

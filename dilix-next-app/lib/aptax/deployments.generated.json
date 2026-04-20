@@ -1,0 +1,9 @@
+{
+  "base-sepolia": {
+    "network": "base-sepolia",
+    "chainId": 84532,
+    "registry": "0xE79D3fa05aE722a69bbd5c47558C7b4F423Cf23d",
+    "metricStore": "0x1849367bA40715d98C4bC107e4c9AAC8392661E9",
+    "verifier": "0xA6741DdCd52320921e6513D6310ac0FB5967Ba73"
+  }
+}

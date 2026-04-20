@@ -10,23 +10,23 @@ import { http } from "viem";
 import { createStorage, noopStorage, WagmiProvider } from "wagmi";
 
 import {
-  aptaxWalletChain,
-  aptaxWalletConnectProjectId,
-  aptaxNetworkRpcUrl,
+  networkRpcUrl,
+  walletChain,
+  walletConnectProjectId,
 } from "@/lib/aptax/wallet";
 
 const wagmiConfig = getDefaultConfig({
   appName: "Aptax",
   appDescription: "Confidential due diligence and bounded verification flows.",
   appUrl: "https://aptax.local",
-  projectId: aptaxWalletConnectProjectId,
-  chains: [aptaxWalletChain],
+  projectId: walletConnectProjectId,
+  chains: [walletChain],
   ssr: false,
   storage: createStorage({
     storage: noopStorage,
   }),
   transports: {
-    [aptaxWalletChain.id]: http(aptaxNetworkRpcUrl),
+    [walletChain.id]: http(networkRpcUrl),
   },
 });
 
@@ -37,7 +37,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          initialChain={aptaxWalletChain}
+          initialChain={walletChain}
           theme={darkTheme({
             accentColor: "#0f9d8a",
             accentColorForeground: "#f4f2ea",

@@ -30,7 +30,7 @@ export default function PlatformPage() {
     <main className="min-h-screen bg-[#08090a] px-6 py-10 text-[#f7f8f8] sm:px-10">
       <div className="mx-auto max-w-6xl space-y-6">
         <section className="border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))] px-6 py-8">
-          <p className="font-label text-[10px] uppercase tracking-[0.28em] text-[#7170ff]">
+          <p className="font-label text-[10px] uppercase tracking-[0.28em] text-[#4a4ace]">
             Built on Aptax
           </p>
           <h1 className="mt-3 text-5xl font-[510] leading-none tracking-[-0.06em] text-[#f7f8f8]">

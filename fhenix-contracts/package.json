@@ -5,10 +5,12 @@
   "scripts": {
     "build": "hardhat compile",
     "clean": "hardhat clean",
+    "sync:dilix-app": "ts-node scripts/sync-dilix-app.ts",
     "test": "hardhat test",
     "deploy:hardhat": "hardhat run scripts/deploy.ts --network hardhat",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network eth-sepolia",
-    "deploy:arb-sepolia": "hardhat run scripts/deploy.ts --network arb-sepolia"
+    "deploy:arb-sepolia": "hardhat run scripts/deploy.ts --network arb-sepolia",
+    "deploy:base-sepolia": "hardhat run scripts/deploy.ts --network base-sepolia"
   },
   "keywords": [],
   "author": "",

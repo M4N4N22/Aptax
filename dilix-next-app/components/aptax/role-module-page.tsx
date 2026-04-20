@@ -49,7 +49,6 @@ export function RoleModulePage({
   return (
     <div className="space-y-6">
       <WorkspacePageHeader
-        eyebrow={eyebrow}
         title={title}
         description={description}
         actions={
@@ -73,7 +72,7 @@ export function RoleModulePage({
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <SectionCard eyebrow="Workspace context" title={getDilixWorkspaceLabel(profile)}>
+        <SectionCard  title={getDilixWorkspaceLabel(profile)}>
           <div className="grid gap-3">
             {highlights.map((item) => (
               <div
@@ -90,7 +89,7 @@ export function RoleModulePage({
           </div>
         </SectionCard>
 
-        <SectionCard eyebrow="Implementation state" title="Product-shaped, MVP depth">
+        <SectionCard title="Product-shaped, MVP depth">
           {!notes?.length ? (
             <EmptyState message="This module is structured intentionally now and will deepen as the flagship workflow expands." />
           ) : (

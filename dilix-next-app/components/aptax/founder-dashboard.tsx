@@ -1,8 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useState, useTransition } from "react";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import Link from "next/link";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { usePublicClient } from "wagmi";
 
 import {
   EmptyState,
@@ -12,86 +12,141 @@ import {
   WorkspacePageHeader,
 } from "@/components/aptax/app-shell";
 import { Button } from "@/components/ui/button";
+import { aptaxVerifierViemAbi } from "@/lib/aptax/abis";
 import type { DilixFounderProfile } from "@/lib/aptax/onboarding";
-import { abbreviateAddress, makeSubjectId } from "@/lib/aptax/browser";
 import {
-  createBrowserSession,
-  ensureSubjectRegistered,
+  abbreviateAddress,
+  diligenceMetricSlugs,
+  makeMetricKey,
+  makeSubjectId,
+} from "@/lib/aptax/browser";
+import {
   getAptaxConfig,
   getSubjectRequests,
   getSubjects,
-  storeFounderMrr,
 } from "@/lib/aptax/client";
 import type {
+  AptaxMetricSlug,
   AptaxPublicConfig,
   SubjectSummary,
   VerificationRequestSummary,
 } from "@/lib/aptax/types";
 
-const WalletConnectButton = dynamic(
-  () =>
-    import("@/components/providers/wallet-connect-button").then(
-      (mod) => mod.WalletConnectButton
-    ),
-  { ssr: false }
-);
-
-type FounderFormState = {
-  slug: string;
-  metadataUri: string;
-  mrr: string;
+type VerificationClaim = {
+  slug: AptaxMetricSlug;
+  label: string;
+  description: string;
+  status: "not_uploaded" | "not_verified" | "verified";
+  updatedAt?: bigint;
 };
+
+function makeStartupSlug(startupName?: string) {
+  return (
+    startupName
+      ?.toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "aptax-labs"
+  );
+}
 
 function formatSubjectLabel(subjectId: string) {
   return `${subjectId.slice(0, 10)}...${subjectId.slice(-6)}`;
 }
 
+function formatTimestamp(value: number) {
+  const timestamp = value > 10_000_000_000 ? value : value * 1000;
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(timestamp));
+}
+
+function getRequestStatusCopy(status: VerificationRequestSummary["status"]) {
+  return status === "computed"
+    ? { label: "Ready to share", tone: "success" as const }
+    : { label: "Needs review", tone: "warning" as const };
+}
+
+function getClaimStatusCopy(status: VerificationClaim["status"]) {
+  if (status === "verified") {
+    return { label: "Verified", tone: "success" as const };
+  }
+
+  if (status === "not_verified") {
+    return { label: "Not verified", tone: "warning" as const };
+  }
+
+  return { label: "Not yet uploaded", tone: "neutral" as const };
+}
+
+const claimDefinitions: Array<Pick<VerificationClaim, "slug" | "label" | "description">> = [
+  {
+    slug: "mrr",
+    label: "MRR",
+    description:
+      "Monthly recurring revenue shows the predictable revenue your company brings in each month.",
+  },
+  {
+    slug: "runway_months",
+    label: "Runway",
+    description:
+      "Runway estimates how many months the company can keep operating before it needs more capital.",
+  },
+  {
+    slug: "cash_balance",
+    label: "Cash balance",
+    description: "Cash balance reflects the liquid funds the company currently has available.",
+  },
+  {
+    slug: "gross_margin_bps",
+    label: "Gross margin",
+    description:
+      "Gross margin shows how much revenue remains after direct delivery costs, expressed as a percentage.",
+  },
+  {
+    slug: "customer_concentration_bps",
+    label: "Customer concentration",
+    description:
+      "Customer concentration indicates how dependent the business is on a small number of customers.",
+  },
+];
+
 export function FounderDashboard({ profile }: { profile?: DilixFounderProfile }) {
-  const { address, chainId, isConnected } = useAccount();
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const [config, setConfig] = useState<AptaxPublicConfig | null>(null);
   const [subjects, setSubjects] = useState<SubjectSummary[]>([]);
   const [requests, setRequests] = useState<VerificationRequestSummary[]>([]);
-  const [form, setForm] = useState<FounderFormState>({
-    slug:
-      profile?.startupName
-        ?.toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "") || "aptax-labs",
-    metadataUri:
-      profile?.startupName
-        ?.toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        ? `ipfs://${profile.startupName
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "")}`
-        : "ipfs://aptax-labs",
-    mrr: "25000",
-  });
+  const startupSlug = makeStartupSlug(profile?.startupName);
+  const onboardedSubjectId = makeSubjectId(startupSlug);
   const [selectedSubjectId, setSelectedSubjectId] = useState("");
-  const [statusMessage, setStatusMessage] = useState(
-    "Connect a wallet to register a startup subject and store encrypted MRR."
+  const [verificationClaims, setVerificationClaims] = useState<VerificationClaim[]>(
+    claimDefinitions.map((claim) => ({
+      ...claim,
+      status: "not_uploaded",
+    }))
   );
-  const [lastMetricCheck, setLastMetricCheck] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
-  const loadSubjects = async () => {
-    const nextSubjects = await getSubjects();
+  const loadSubjects = useCallback(async () => {
+    const nextSubjects = (await getSubjects()).filter(
+      (subject) => subject.subjectId === onboardedSubjectId
+    );
     setSubjects(nextSubjects);
-    setSelectedSubjectId((current) => current || nextSubjects[0]?.subjectId || "");
-  };
+    setSelectedSubjectId(nextSubjects[0]?.subjectId ?? "");
+  }, [onboardedSubjectId]);
 
-  const loadRequests = async (subjectId: string) => {
+  const loadRequests = useCallback(async (subjectId: string) => {
     if (!subjectId) {
       setRequests([]);
       return;
     }
 
-    setRequests(await getSubjectRequests(subjectId));
-  };
+    const nextRequests = await getSubjectRequests(subjectId);
+    setRequests(nextRequests.sort((left, right) => right.createdAt - left.createdAt));
+  }, []);
 
   useEffect(() => {
     startTransition(() => {
@@ -100,16 +155,13 @@ export function FounderDashboard({ profile }: { profile?: DilixFounderProfile })
         setConfig(nextConfig);
 
         if (!nextConfig.configured) {
-          setStatusMessage(nextConfig.error ?? "Aptax contracts are not configured.");
           return;
         }
 
         await loadSubjects();
-      })().catch((error) => {
-        setStatusMessage(error instanceof Error ? error.message : "Failed to load Aptax config.");
-      });
+      })().catch(() => {});
     });
-  }, []);
+  }, [loadSubjects]);
 
   useEffect(() => {
     if (!selectedSubjectId) {
@@ -117,322 +169,345 @@ export function FounderDashboard({ profile }: { profile?: DilixFounderProfile })
     }
 
     startTransition(() => {
-      void loadRequests(selectedSubjectId).catch((error) => {
-        setStatusMessage(
-          error instanceof Error ? error.message : "Could not load verification requests."
-        );
-      });
+      void loadRequests(selectedSubjectId).catch(() => {});
     });
-  }, [selectedSubjectId]);
+  }, [loadRequests, selectedSubjectId]);
 
-  const storeEncryptedMetric = () => {
-    startTransition(() => {
-      void (async () => {
-        const nextConfig = config ?? (await getAptaxConfig());
-        const session = await createBrowserSession(nextConfig, {
-          account: address,
-          chainId,
-          publicClient,
-          walletClient,
-        });
+  useEffect(() => {
+    let cancelled = false;
 
-        const subjectId = makeSubjectId(form.slug);
-        setSelectedSubjectId(subjectId);
-        const metadataUri = form.metadataUri.trim() || `ipfs://${form.slug.trim()}`;
-        const created = await ensureSubjectRegistered(session, subjectId, metadataUri);
-        const { mrr, founderOnlyValue } = await storeFounderMrr(session, subjectId, form.mrr);
+    void (async () => {
+      if (!config?.configured || !publicClient || !selectedSubjectId) {
+        if (!cancelled) {
+          setVerificationClaims(
+            claimDefinitions.map((claim) => ({
+              ...claim,
+              status: "not_uploaded",
+            }))
+          );
+        }
+        return;
+      }
 
-        setLastMetricCheck(
-          founderOnlyValue === mrr
-            ? "Founder-only decrypt check passed for the stored MRR handle."
-            : "Stored metric did not round-trip through decryptForView as expected."
+      const claimRecords = await Promise.all(
+        diligenceMetricSlugs.map(async (slug) => {
+          const metricKey = makeMetricKey(slug);
+          const metricRecord = await publicClient.readContract({
+            address: config.verifierAddress as `0x${string}`,
+            abi: aptaxVerifierViemAbi,
+            functionName: "getMetricRecordForKey",
+            args: [selectedSubjectId as `0x${string}`, metricKey as `0x${string}`],
+          });
+
+          return {
+            slug,
+            metricKey,
+            metricRecord: metricRecord as {
+              handle: `0x${string}`;
+              isSet: boolean;
+              updatedAt: bigint;
+            },
+          };
+        })
+      );
+
+      if (cancelled) {
+        return;
+      }
+
+      setVerificationClaims(
+        claimDefinitions.map((claim) => {
+          const record = claimRecords.find((entry) => entry.slug === claim.slug);
+          const uploaded = Boolean(record?.metricRecord.isSet);
+          const verified =
+            uploaded &&
+            requests.some(
+              (request) => request.metricKey === record?.metricKey && request.status === "computed"
+            );
+
+          return {
+            ...claim,
+            status: !uploaded ? "not_uploaded" : verified ? "verified" : "not_verified",
+            updatedAt: record?.metricRecord.updatedAt,
+          };
+        })
+      );
+    })().catch(() => {
+      if (!cancelled) {
+        setVerificationClaims(
+          claimDefinitions.map((claim) => ({
+            ...claim,
+            status: "not_uploaded",
+          }))
         );
-        setStatusMessage(
-          created
-            ? `Subject registered and encrypted MRR stored on-chain for ${abbreviateAddress(session.account)}.`
-            : `Encrypted MRR stored on-chain for the existing subject owned by ${abbreviateAddress(session.account)}.`
-        );
-        await loadSubjects();
-        await loadRequests(subjectId);
-      })().catch((error) => {
-        setStatusMessage(
-          error instanceof Error ? error.message : "Could not store the encrypted metric."
-        );
-      });
+      }
     });
-  };
+
+    return () => {
+      cancelled = true;
+    };
+  }, [config, publicClient, requests, selectedSubjectId]);
 
   const selectedSubject =
     subjects.find((subject) => subject.subjectId === selectedSubjectId) ?? null;
-  const pendingRequests = requests.filter((request) => request.status !== "computed");
+  const openRequests = requests.filter((request) => request.status !== "computed");
+  const pendingRequests = openRequests;
+  const activeInvestors = Array.from(new Set(requests.map((request) => request.requester)));
+  const activeInvestorRooms = activeInvestors
+    .map((requester) => {
+      const investorRequests = requests
+        .filter((request) => request.requester === requester)
+        .sort((left, right) => right.createdAt - left.createdAt);
+      const completedCount = investorRequests.filter((request) => request.status === "computed").length;
+      const openCount = investorRequests.length - completedCount;
+
+      return {
+        requester,
+        completedCount,
+        openCount,
+        latestActivity: investorRequests[0]?.createdAt ?? 0,
+      };
+    })
+    .sort((left, right) => right.latestActivity - left.latestActivity);
+  const readinessItems = [
+    {
+      label: "Company profile",
+      description: profile?.startupName && profile.startupStage && profile.startupCategory && profile.roleAtCompany
+        ? "Your company basics are in place and ready for diligence."
+        : "Add your company details so investors have the right context.",
+      complete: Boolean(
+        profile?.startupName &&
+        profile.startupStage &&
+        profile.startupCategory &&
+        profile.roleAtCompany
+      ),
+    },
+    {
+      label: "Company data",
+      description: selectedSubject
+        ? "Core company data is available for verification."
+        : "Add company data to start preparing claims investors can verify.",
+      complete: Boolean(selectedSubject),
+    },
+    {
+      label: "Verification readiness",
+      description: config?.configured && selectedSubject
+        ? "Your workspace is ready to support verification requests."
+        : "Finish setting up your workspace before sending verification results.",
+      complete: Boolean(config?.configured && selectedSubject),
+    },
+    {
+      label: "Investor activity",
+      description: requests.length
+        ? "Investor requests are already moving through this workspace."
+        : "No investor requests yet. Once requests arrive, they’ll appear here.",
+      complete: requests.length > 0,
+    },
+  ];
+
+  const readyClaims = verificationClaims.filter((claim) => claim.status !== "not_uploaded").length;
 
   const eventFeed = [
-    selectedSubject
-      ? `Focused on subject ${formatSubjectLabel(selectedSubject.subjectId)} for diligence review.`
-      : null,
-    lastMetricCheck || null,
     requests[0]
-      ? `Most recent request ${requests[0].id} is ${requests[0].status} at threshold ${requests[0].threshold}.`
+      ? `New request received from ${abbreviateAddress(requests[0].requester)} for an MRR threshold check.`
+      : null,
+    selectedSubject
+      ? `Company subject ${formatSubjectLabel(selectedSubject.subjectId)} is linked to this workspace.`
+      : null,
+    activeInvestorRooms[0]
+      ? `Access updated for ${abbreviateAddress(activeInvestorRooms[0].requester)}.`
       : null,
   ].filter(Boolean) as string[];
 
   return (
     <div className="space-y-6">
       <WorkspacePageHeader
-        eyebrow="Founder workflow"
-        title={
-          profile?.startupName
-            ? `${profile.startupName} founder workspace`
-            : "Store encrypted metrics and manage diligence visibility"
-        }
-        description={
-          profile
-            ? `Dilix is set up for ${profile.fullName} as ${profile.roleAtCompany}. Register your company subject, encrypt MRR client-side, and keep investor diligence focused on bounded answers instead of raw data.`
-            : "This founder module stays inside the flagship Aptax Due Diligence workspace. Register a subject, encrypt MRR client-side, and monitor investor requests without exposing raw business data."
-        }
+        title={profile?.startupName ?? "Founder workspace"}
+        description="Run diligence with more control"
         actions={
           <>
-            <WalletConnectButton />
-            <StatusBadge
-              label={config?.configured ? `network ${config.networkChainId}` : "config needed"}
-              tone={config?.configured ? "accent" : "warning"}
-            />
+            <Link href="/app/founder/upload">
+              <Button variant="default" >
+                Upload company data
+              </Button>
+            </Link>
+            <Link href="/app/founder/requests">
+              <Button variant="outline"  >
+                Review requests
+              </Button>
+            </Link>
           </>
         }
       />
 
+      <p className="max-w-3xl text-sm leading-7 text-[#8a8f98]">
+        Manage investor requests, track what&apos;s ready to verify, and keep sensitive company
+        data protected.
+      </p>
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
-          label="Registered companies"
-          value={subjects.length.toString()}
-          detail="Startup profiles available to this founder workspace."
+          label="Open requests"
+          value={openRequests.length.toString()}
+          detail="Active diligence checks still moving through this company workspace."
         />
         <SummaryCard
-          label="Selected requests"
-          value={requests.length.toString()}
-          detail="Verification checks targeting the currently selected company."
+          label="Ready to verify"
+          value={`${readyClaims} claim${readyClaims === 1 ? "" : "s"}`}
+          detail="Claims with a configured founder-side data path right now."
         />
         <SummaryCard
-          label="Awaiting review"
+          label="Pending review"
           value={pendingRequests.length.toString()}
-          detail="Open diligence requests still visible to the founder."
+          detail="Requests that still need founder attention before moving forward."
         />
         <SummaryCard
-          label="Metric validation"
-          value={lastMetricCheck ? "Passed" : "Pending"}
-          detail="A quick founder-only decrypt check after storing encrypted MRR."
+          label="Active investors"
+          value={activeInvestors.length.toString()}
+          detail="Investor counterparties currently active in this diligence flow."
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <SectionCard eyebrow="Session" title="Founder session and deployment context">
-          <div className="flex flex-wrap items-center gap-3">
-            <StatusBadge
-              label={address ? abbreviateAddress(address) : "not connected"}
-              tone={address ? "success" : "warning"}
-            />
-            <StatusBadge
-              label={isConnected ? "connected" : "disconnected"}
-              tone={isConnected ? "success" : "warning"}
-            />
-            <StatusBadge
-              label={selectedSubject ? "subject selected" : "no subject selected"}
-              tone={selectedSubject ? "accent" : "neutral"}
-            />
-          </div>
+      <div className="flex flex-col gap-6">
+        <div className="space-y-6 flex gap-6">
+          <SectionCard title="Investor requests" >
+            <div id="investor-requests" className="grid gap-3">
+              {!selectedSubjectId ? (
+                <EmptyState message="Register your company subject first so investor requests can route into this workspace." />
+              ) : requests.length === 0 ? (
+                <EmptyState message="No investor requests are active yet. Once investors begin requesting checks, this list becomes your live operating queue." />
+              ) : (
+                requests.map((request) => {
+                  const requestStatus = getRequestStatusCopy(request.status);
 
-          <p className="mt-4 text-sm leading-7 text-[#8a8f98]">{statusMessage}</p>
-
-          {selectedSubject ? (
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              <div className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4">
-                <p className="text-sm font-[510] text-[#62666d]">Subject owner</p>
-                <p className="mt-3 text-sm font-[510] text-[#f7f8f8]">
-                  {abbreviateAddress(selectedSubject.owner)}
-                </p>
-              </div>
-              <div className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4">
-                <p className="text-sm font-[510] text-[#62666d]">Registered metadata</p>
-                <p className="mt-3 break-all text-sm text-[#8a8f98]">
-                  {selectedSubject.metadataUri}
-                </p>
-              </div>
+                  return (
+                    <div
+                      key={request.id}
+                      className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-sm font-[510] text-[#f7f8f8]">
+                            {abbreviateAddress(request.requester)}
+                          </p>
+                          <p className="text-sm text-[#d0d6e0]">MRR threshold check</p>
+                          <p className="text-xs text-[#62666d]">
+                            Threshold {request.threshold} • Updated {formatTimestamp(request.createdAt)}
+                          </p>
+                        </div>
+                        <StatusBadge label={requestStatus.label} tone={requestStatus.tone} />
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
-          ) : null}
-        </SectionCard>
+          </SectionCard>
 
-        <SectionCard eyebrow="Encrypted metric" title="Register startup and store MRR">
-          <div className="grid gap-4">
-            <label className="grid gap-2 text-sm">
-              <span className="text-sm font-[510] text-[#62666d]">Startup slug</span>
-              <input
-                value={form.slug}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, slug: event.target.value }))
-                }
-                className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] px-4 py-3 text-sm text-[#f7f8f8] outline-none transition focus:border-[rgba(130,143,255,0.38)]"
-                placeholder="aptax-labs"
-              />
-            </label>
+          <SectionCard title="Recent activity" >
+            {eventFeed.length === 0 ? (
+              <EmptyState message="Activity will appear here as founder data is uploaded, investor requests arrive, and verification results are prepared." />
+            ) : (
+              <div className="grid gap-3">
+                {eventFeed.map((event, index) => (
+                  <div
+                    key={`${event}-${index}`}
+                    className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4"
+                  >
+                    <p className="text-sm leading-6 text-[#8a8f98]">{event}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </SectionCard>
+        </div>
 
-            <label className="grid gap-2 text-sm">
-              <span className="text-sm font-[510] text-[#62666d]">Metadata URI</span>
-              <input
-                value={form.metadataUri}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, metadataUri: event.target.value }))
-                }
-                className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] px-4 py-3 text-sm text-[#f7f8f8] outline-none transition focus:border-[rgba(130,143,255,0.38)]"
-                placeholder="ipfs://aptax-labs"
-              />
-            </label>
-
-            <label className="grid gap-2 text-sm">
-              <span className="text-sm font-[510] text-[#62666d]">Monthly recurring revenue</span>
-              <input
-                value={form.mrr}
-                onChange={(event) => setForm((current) => ({ ...current, mrr: event.target.value }))}
-                className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] px-4 py-3 text-sm text-[#f7f8f8] outline-none transition focus:border-[rgba(130,143,255,0.38)]"
-                inputMode="numeric"
-                placeholder="25000"
-              />
-            </label>
-
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              disabled={isPending}
-              onClick={storeEncryptedMetric}
-              className="mt-2 rounded-xl border-[rgba(130,143,255,0.35)] bg-[rgba(113,112,255,0.14)] px-4 text-[#f7f8f8] hover:bg-[rgba(113,112,255,0.2)] hover:text-[#f7f8f8]"
-            >
-              {isPending ? "Encrypting and storing..." : "Register and store encrypted MRR"}
-            </Button>
-          </div>
-        </SectionCard>
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <SectionCard eyebrow="Company overview" title="Registered startup subjects">
-          {subjects.length === 0 ? (
-            <EmptyState message="No startup subjects are registered yet. Store a metric to create the first company profile in the due diligence workspace." />
-          ) : (
-            <div className="grid gap-3">
-              {subjects.map((subject) => {
-                const active = subject.subjectId === selectedSubjectId;
-
-                return (
-                  <button
-                    key={subject.subjectId}
-                    type="button"
-                    onClick={() => setSelectedSubjectId(subject.subjectId)}
-                  className={[
-                      "rounded-[22px] border px-4 py-4 text-left transition",
-                      active
-                        ? "border-[rgba(130,143,255,0.35)] bg-[rgba(113,112,255,0.08)]"
-                        : "border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] hover:border-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.03)]",
-                    ].join(" ")}
+        <div className="space-y-6">
+          <div className="flex gap-6">
+            <SectionCard title="Diligence readiness" >
+              <div className="grid gap-3">
+                {readinessItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-[22px] bg-[rgba(255,255,255,0.015)] px-4 py-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-lg font-[510] tracking-[-0.03em] text-[#f7f8f8]">
-                        {formatSubjectLabel(subject.subjectId)}
-                      </p>
+                      <p className="text-sm font-[510] text-[#f7f8f8]">{item.label}</p>
                       <StatusBadge
-                        label={active ? "Selected" : "Startup"}
-                        tone={active ? "accent" : "neutral"}
+                        label={item.complete ? "Complete" : "In progress"}
+                        tone={item.complete ? "success" : "warning"}
                       />
                     </div>
-                    <p className="mt-3 text-sm text-[#8a8f98]">
-                      Owner {abbreviateAddress(subject.owner)}
-                    </p>
-                    <p className="mt-1 break-all text-xs leading-6 text-[#62666d]">
-                      {subject.metadataUri}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </SectionCard>
-
-        <SectionCard eyebrow="Verification requests" title="Diligence checks targeting this company">
-          {!selectedSubjectId ? (
-            <EmptyState message="Choose a subject to inspect the threshold verification requests targeting it." />
-          ) : requests.length === 0 ? (
-            <EmptyState message="No investor requests yet for the selected startup subject." />
-          ) : (
-            <div className="grid gap-3">
-              {requests.map((request) => (
-                <div
-                  key={request.id}
-                  className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-[510] text-[#f7f8f8]">Request {request.id}</p>
-                      <p className="mt-1 text-xs text-[#62666d]">
-                        Threshold {request.threshold}
-                      </p>
-                    </div>
-                    <StatusBadge
-                      label={request.status}
-                      tone={request.status === "computed" ? "success" : "warning"}
-                    />
+                    <p className="mt-2 text-sm leading-6 text-[#8a8f98]">{item.description}</p>
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-[#8a8f98]">
-                    Requester {abbreviateAddress(request.requester)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </SectionCard>
-      </div>
+                ))}
+              </div>
+            </SectionCard>
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <SectionCard eyebrow="Permissions" title="Access policy">
-          <div className="grid gap-3">
-            <div className="border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-[510] text-[#f7f8f8]">Raw business metrics</p>
-                <StatusBadge label="Founder-only" tone="success" />
+            <SectionCard title="What investors can verify">
+              <div className="grid gap-3">
+                {verificationClaims.map((claim) => (
+                  <div
+                    key={claim.label}
+                    className="rounded-[22px]  bg-[rgba(255,255,255,0.015)] px-4 py-4"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-[510] text-[#f7f8f8]">{claim.label}</p>
+                      <StatusBadge
+                        label={getClaimStatusCopy(claim.status).label}
+                        tone={getClaimStatusCopy(claim.status).tone}
+                      />
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[#8a8f98]">{claim.description}</p>
+                    {claim.updatedAt && claim.updatedAt > 0n ? (
+                      <p className="mt-2 text-xs leading-6 text-[#62666d]">
+                        Last uploaded {formatTimestamp(Number(claim.updatedAt))}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
               </div>
-              <p className="mt-2 text-sm leading-6 text-[#8a8f98]">
-                The flagship app never exposes raw MRR to investors. Verification requests only
-                resolve to bounded answers.
-              </p>
-            </div>
-            <div className="border border-dashed border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.01)] px-4 py-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-[510] text-[#f7f8f8]">Granular sharing controls</p>
-                <StatusBadge label="In development" tone="neutral" />
-              </div>
-              <p className="mt-2 text-sm leading-6 text-[#8a8f98]">
-                Future workspace controls can define richer permissioning without moving platform
-                surfaces into the primary due diligence sidebar.
-              </p>
-            </div>
+            </SectionCard>
           </div>
-        </SectionCard>
-
-        <SectionCard eyebrow="Activity" title="Recent founder-side events">
-          {eventFeed.length === 0 ? (
-            <EmptyState message="Founder activity will appear here after subject registration, encrypted metric storage, or incoming investor requests." />
-          ) : (
-            <div className="grid gap-3">
-              {eventFeed.map((event, index) => (
-                <div
-                  key={`${event}-${index}`}
-                  className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4"
-                >
-                  <p className="text-sm font-[510] text-[#62666d]">Event {index + 1}</p>
-                  <p className="mt-3 text-sm leading-6 text-[#8a8f98]">{event}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </SectionCard>
+        </div>
       </div>
+
+      <SectionCard title="Active investors">
+        {activeInvestorRooms.length === 0 ? (
+          <EmptyState message="No investor rooms are active yet. As requests begin to flow, this section will show your live diligence counterparties." />
+        ) : (
+          <div className="grid gap-3 lg:grid-cols-3">
+            {activeInvestorRooms.map((room) => (
+              <div
+                key={room.requester}
+                className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] px-4 py-4"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm font-[510] text-[#f7f8f8]">
+                    {abbreviateAddress(room.requester)}
+                  </p>
+                  <StatusBadge
+                    label={
+                      room.openCount > 0
+                        ? `${room.openCount} open request${room.openCount === 1 ? "" : "s"}`
+                        : `${room.completedCount} completed`
+                    }
+                    tone={room.openCount > 0 ? "warning" : "success"}
+                  />
+                </div>
+                <p className="mt-3 text-sm text-[#8a8f98]">
+                  {room.completedCount > 0
+                    ? `${room.completedCount} request${room.completedCount === 1 ? "" : "s"} completed`
+                    : "No completed requests yet"}
+                </p>
+                <p className="mt-1 text-xs leading-6 text-[#62666d]">
+                  Last active {formatTimestamp(room.latestActivity)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </SectionCard>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { WagmiAdapter } from "@cofhe/sdk/adapters";
-import { arbSepolia, hardhat, localcofhe, sepolia } from "@cofhe/sdk/chains";
+import { arbSepolia, baseSepolia, hardhat, localcofhe, sepolia } from "@cofhe/sdk/chains";
 import { createCofheClient, createCofheConfig } from "@cofhe/sdk/web";
 import { ethers } from "ethers";
 import type { PublicClient, WalletClient } from "viem";
@@ -25,6 +25,7 @@ const chainById = {
   42069: localcofhe,
   11155111: sepolia,
   421614: arbSepolia,
+  84532: baseSepolia,
 } as const;
 
 export type AptaxWalletSessionInput = {
