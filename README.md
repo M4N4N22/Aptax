@@ -1,10 +1,28 @@
 # Aptax
 
-Aptax is a confidential verification stack built on top of Fhenix.
+Aptax is a confidential verification stack built on top of Fhenix and CoFHE.
 
 The current flagship product is Dilix, a private due diligence workspace where founders can upload company metrics, investors can request bounded checks, and the system returns only the minimum result needed for the workflow.
 
 Live app: [aptax.vercel.app](https://aptax.vercel.app/)
+
+## Fhenix and CoFHE in Aptax
+
+Fhenix is the cryptographic foundation of this project, not just an implementation detail.
+
+Today, Aptax uses Fhenix and CoFHE for:
+
+- encrypted metric inputs in the Aptax contracts
+- encrypted comparison logic for bounded verification requests
+- browser-side encryption and permit flows through `@cofhe/sdk`
+- founder-only decrypt-for-view flows in the Dilix app
+- verifier access to encrypted metrics without exposing the underlying values
+
+In practical terms:
+
+- Fhenix provides the encrypted types and computation primitives
+- CoFHE provides the client-side interaction flow used by the app
+- Aptax wraps those primitives into a usable verification layer and product workflow
 
 ## What the project is
 
@@ -13,6 +31,7 @@ Modern diligence workflows usually require founders to overshare raw data with e
 Aptax changes that model:
 
 - Fhenix powers encrypted computation.
+- CoFHE powers the app-side encryption, permit, and decrypt interaction flow.
 - Aptax provides the verification contracts, integration flow, and product surface.
 - Dilix is the first application built on top of that stack.
 
@@ -49,6 +68,11 @@ Today this repo contains the verification loop:
 - a founder workspace for onboarding, company profile, data room, and manual data upload
 - an investor workspace for request-oriented diligence flows
 - deployment sync so contract ABIs and addresses are copied into the app automatically
+
+Fhenix usage already spans both packages:
+
+- `fhenix-contracts` uses FHE encrypted types and operations inside the Aptax verification contracts
+- `dilix-next-app` uses `@cofhe/sdk` for session setup, encryption, permits, and decrypt-for-view flows
 
 
 ## Base Sepolia deployment
@@ -152,9 +176,25 @@ That deployment flow:
 
 - Aptax is a product and verification layer.
 - The current deployed network is Base Sepolia.
-- Fhenix handles encrypted computation; Aptax wraps that capability into a diligence workflow.
+- Fhenix handles encrypted computation and CoFHE handles the app-side interaction flow; Aptax turns that into a diligence workflow.
 - The current upload UI uses manual input for demo clarity.
 - The intended production direction is hybrid data ingestion plus an attestation/review layer, so a metric can be verified once and reused across multiple investor workflows with less raw-data exposure.
+
+## Future Fhenix expansion
+
+The current implementation uses Fhenix and CoFHE for the first complete diligence loop, but the expansion path is broader.
+
+Planned or likely next uses include:
+
+- more claim templates beyond simple threshold checks
+- richer encrypted policy checks for diligence and readiness workflows
+- reusable verification results across more investor requests and rooms
+- stronger permissioning and scoped result sharing
+- broader verification products beyond diligence, such as treasury policy checks, private compliance checks, and eligibility verification
+
+The long-term goal is not just a diligence app that happens to use Fhenix.
+
+It is a Fhenix-powered verification platform where the same encrypted computation foundation can support more product surfaces, APIs, SDKs, and future agent-native workflows.
 
 ## Read more
 
