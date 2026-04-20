@@ -21,12 +21,12 @@ export default async function FounderRequestsPage() {
   return (
     <div className="space-y-6">
       <WorkspacePageHeader
-        eyebrow="Founder module"
+      
         title="Verification requests"
         description="A focused founder queue for seeing which investor checks are targeting the current company set. This keeps request visibility inside the founder workspace instead of a mixed global sidebar."
       />
 
-      <SectionCard eyebrow="Inbound activity" title="Recent investor requests">
+      <SectionCard  title="Recent investor requests">
         {snapshot.requests.length === 0 ? (
           <EmptyState message="No inbound verification requests are visible yet. Once investors begin requesting checks, they will appear here in a founder-first queue." />
         ) : (

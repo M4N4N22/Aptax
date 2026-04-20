@@ -84,11 +84,7 @@ const surfaceCards: Array<
     footer: (
       <div className="flex items-center gap-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          alt="Close-up of a high-resolution laptop screen showing clean organized code with syntax highlighting in a dark studio setting"
-          className="h-16 w-16 border border-[rgba(255,255,255,0.12)] object-cover grayscale"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSv8NXFK1qP79KguSCMZKuESlPHKblVk9joThAVMo_OD0xEilpK5-uOuG-4Vqt9Q-OPHBuuYGrh3bByYLso1cjjWFFWyWCcUg25Xu_PbM1x8XGxu5n7JQzVN0uAfkV-p3xF8bplOhm2sch8bRKTL0GBY170kZ9fuqYF2NwWEsv-QH-GjgR8TXyH2ltbJqpGzo-bkw1iHfJOSMPFDvkwo2lBoWpg7EaU6_fqzb94fhnmj96W3Tlaa9IZBfX-tgHhvDvz2w0apUWTsh6"
-        />
+   
         <span className="font-label text-xs uppercase tracking-widest text-[var(--text-soft)]">
           Integrated Ecosystem
         </span>

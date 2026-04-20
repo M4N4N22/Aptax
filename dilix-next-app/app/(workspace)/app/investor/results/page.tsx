@@ -21,12 +21,12 @@ export default async function InvestorResultsPage() {
   return (
     <div className="space-y-6">
       <WorkspacePageHeader
-        eyebrow="Investor module"
+       
         title="Bounded results"
         description="Resolved investor-visible outcomes stay in a dedicated results surface so the workspace feels more like a product and less like a single mixed dashboard."
       />
 
-      <SectionCard eyebrow="Resolved outcomes" title="Latest computed answers">
+      <SectionCard  title="Latest computed answers">
         {snapshot.computedRequests.length === 0 ? (
           <EmptyState message="No computed results are available yet. Once requests are resolved, only the bounded answer will appear here." />
         ) : (

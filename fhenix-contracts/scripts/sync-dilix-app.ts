@@ -36,17 +36,11 @@ async function syncGeneratedAbis() {
   const verifierArtifact = await readArtifact("AptaxVerifier", "AptaxVerifier.sol");
 
   const generatedPath = path.join(appLibDir, "abis.generated.ts");
-  const fileContents = `import type { Abi } from "viem";
+  const fileContents = `export const aptaxRegistryAbi = ${JSON.stringify(registryArtifact.abi, null, 2)} as const;
 
-export const aptaxRegistryAbi = ${JSON.stringify(registryArtifact.abi, null, 2)} as const satisfies Abi;
+export const aptaxMetricStoreAbi = ${JSON.stringify(metricStoreArtifact.abi, null, 2)} as const;
 
-export const aptaxMetricStoreAbi = ${JSON.stringify(metricStoreArtifact.abi, null, 2)} as const satisfies Abi;
-
-export const aptaxVerifierAbi = ${JSON.stringify(verifierArtifact.abi, null, 2)} as const satisfies Abi;
-
-export const aptaxRegistryViemAbi = aptaxRegistryAbi;
-export const aptaxMetricStoreViemAbi = aptaxMetricStoreAbi;
-export const aptaxVerifierViemAbi = aptaxVerifierAbi;
+export const aptaxVerifierAbi = ${JSON.stringify(verifierArtifact.abi, null, 2)} as const;
 `;
 
   await ensureDir(appLibDir);

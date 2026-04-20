@@ -1,6 +1,5 @@
 "use client";
 
-import { Encryptable, FheTypes } from "@cofhe/sdk";
 import type { Address, Hex, PublicClient } from "viem";
 
 import {
@@ -191,6 +190,7 @@ export async function storeFounderMetric(
   metricSlug: AptaxMetricSlug,
   metricValueInput: string
 ) {
+  const [{ Encryptable, FheTypes }] = await Promise.all([import("@cofhe/sdk")]);
   const metricValue = parseUnsignedBigInt(metricValueInput, "Metric value");
   const metricKey = makeMetricKey(metricSlug);
   const [encryptedMrr] = await session.cofheClient
@@ -235,6 +235,7 @@ export async function decryptFounderMetricForView(
   subjectId: string,
   metricSlug: AptaxMetricSlug
 ) {
+  const [{ FheTypes }] = await Promise.all([import("@cofhe/sdk")]);
   const metricKey = makeMetricKey(metricSlug);
   const metricRecord =
     metricSlug === "mrr"
@@ -282,6 +283,7 @@ export async function requestMetricThresholdVerification(
   thresholdInput: string,
   operatorKind: AptaxMetricOperator = "gte"
 ) {
+  const [{ FheTypes }] = await Promise.all([import("@cofhe/sdk")]);
   const threshold = parseUnsignedBigInt(thresholdInput, "Threshold");
   const metricKey = makeMetricKey(metricSlug);
   const normalizedOperatorKind = normalizeOperatorKind(operatorKind);

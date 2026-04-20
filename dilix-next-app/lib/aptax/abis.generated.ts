@@ -1,5 +1,3 @@
-import type { Abi } from "viem";
-
 export const aptaxRegistryAbi = [
   {
     "inputs": [
@@ -111,7 +109,7 @@ export const aptaxRegistryAbi = [
             "type": "uint64"
           }
         ],
-        "internalType": "struct AptaxRegistry.SubjectRecord",
+        "internalType": "struct AptaxRegistry.Subject",
         "name": "",
         "type": "tuple"
       }
@@ -162,25 +160,6 @@ export const aptaxRegistryAbi = [
         "internalType": "bytes32",
         "name": "subjectId",
         "type": "bytes32"
-      }
-    ],
-    "name": "ownerOf",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "subjectId",
-        "type": "bytes32"
       },
       {
         "internalType": "string",
@@ -205,64 +184,24 @@ export const aptaxRegistryAbi = [
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "subjectId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "string",
-        "name": "metadataURI",
-        "type": "string"
-      }
-    ],
-    "name": "updateSubjectMetadata",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   }
-] as const satisfies Abi;
+] as const;
 
 export const aptaxMetricStoreAbi = [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "registryAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "got",
-        "type": "uint8"
+        "internalType": "bytes32",
+        "name": "subjectId",
+        "type": "bytes32"
       },
-      {
-        "internalType": "uint8",
-        "name": "expected",
-        "type": "uint8"
-      }
-    ],
-    "name": "InvalidEncryptedInput",
-    "type": "error"
-  },
-  {
-    "inputs": [
       {
         "internalType": "bytes32",
         "name": "metricKey",
         "type": "bytes32"
       }
     ],
-    "name": "InvalidMetricKey",
+    "name": "MetricAlreadySet",
     "type": "error"
   },
   {
@@ -273,18 +212,7 @@ export const aptaxMetricStoreAbi = [
         "type": "address"
       }
     ],
-    "name": "InvalidVerifier",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "NotOwner",
+    "name": "UnauthorizedVerifier",
     "type": "error"
   },
   {
@@ -293,30 +221,9 @@ export const aptaxMetricStoreAbi = [
         "internalType": "bytes32",
         "name": "subjectId",
         "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
       }
     ],
-    "name": "NotSubjectOwner",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "verifier",
-        "type": "address"
-      }
-    ],
-    "name": "VerifierAlreadyConfigured",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "VerifierNotConfigured",
+    "name": "UnknownSubject",
     "type": "error"
   },
   {
@@ -329,7 +236,7 @@ export const aptaxMetricStoreAbi = [
         "type": "address"
       }
     ],
-    "name": "AuthorizedVerifierSet",
+    "name": "AuthorizedVerifierUpdated",
     "type": "event"
   },
   {
@@ -348,33 +255,14 @@ export const aptaxMetricStoreAbi = [
         "type": "bytes32"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
         "indexed": false,
         "internalType": "bytes32",
-        "name": "metricHandle",
+        "name": "handle",
         "type": "bytes32"
       }
     ],
     "name": "MetricStored",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "MRR_METRIC_KEY",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [],
@@ -436,30 +324,6 @@ export const aptaxMetricStoreAbi = [
         "internalType": "bytes32",
         "name": "subjectId",
         "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "metricKey",
-        "type": "bytes32"
-      }
-    ],
-    "name": "hasMetric",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "subjectId",
-        "type": "bytes32"
       }
     ],
     "name": "listMetricKeysForSubject",
@@ -474,43 +338,11 @@ export const aptaxMetricStoreAbi = [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "subjectId",
-        "type": "bytes32"
-      }
-    ],
-    "name": "metricCountForSubject",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "registry",
     "outputs": [
       {
-        "internalType": "contract AptaxRegistry",
+        "internalType": "contract IAptaxRegistry",
         "name": "",
         "type": "address"
       }
@@ -527,6 +359,46 @@ export const aptaxMetricStoreAbi = [
       }
     ],
     "name": "setAuthorizedVerifier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subjectId",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "ctHash",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "securityZone",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "utype",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct InEuint64",
+        "name": "encryptedMrr",
+        "type": "tuple"
+      }
+    ],
+    "name": "storeEncryptedMrr",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -575,77 +447,10 @@ export const aptaxMetricStoreAbi = [
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "subjectId",
-        "type": "bytes32"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "ctHash",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint8",
-            "name": "securityZone",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint8",
-            "name": "utype",
-            "type": "uint8"
-          },
-          {
-            "internalType": "bytes",
-            "name": "signature",
-            "type": "bytes"
-          }
-        ],
-        "internalType": "struct InEuint64",
-        "name": "encryptedMrr",
-        "type": "tuple"
-      }
-    ],
-    "name": "storeEncryptedMrr",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   }
-] as const satisfies Abi;
+] as const;
 
 export const aptaxVerifierAbi = [
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "registryAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "metricStoreAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "metricKey",
-        "type": "bytes32"
-      }
-    ],
-    "name": "InvalidMetricKey",
-    "type": "error"
-  },
   {
     "inputs": [
       {
@@ -665,23 +470,28 @@ export const aptaxVerifierAbi = [
         "type": "bytes32"
       },
       {
-        "internalType": "bytes32",
-        "name": "metricKey",
-        "type": "bytes32"
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
       }
     ],
-    "name": "MetricNotStored",
+    "name": "NotSubjectOwner",
     "type": "error"
   },
   {
     "inputs": [
       {
-        "internalType": "int32",
-        "name": "value",
-        "type": "int32"
+        "internalType": "bytes32",
+        "name": "subjectId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "metricKey",
+        "type": "bytes32"
       }
     ],
-    "name": "SecurityZoneOutOfBounds",
+    "name": "UnknownMetric",
     "type": "error"
   },
   {
@@ -776,48 +586,6 @@ export const aptaxVerifierAbi = [
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "MRR_METRIC_KEY",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "subjectId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint64",
-        "name": "threshold",
-        "type": "uint64"
-      }
-    ],
-    "name": "createMrrThresholdRequest",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "requestId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "resultHandle",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -841,6 +609,35 @@ export const aptaxVerifierAbi = [
       }
     ],
     "name": "createThresholdRequest",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "resultHandle",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subjectId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint64",
+        "name": "threshold",
+        "type": "uint64"
+      }
+    ],
+    "name": "createMrrThresholdRequest",
     "outputs": [
       {
         "internalType": "uint256",
@@ -981,7 +778,7 @@ export const aptaxVerifierAbi = [
             "type": "bytes32"
           },
           {
-            "internalType": "enum AptaxVerifier.VerificationStatus",
+            "internalType": "enum AptaxVerifier.RequestStatus",
             "name": "status",
             "type": "uint8"
           },
@@ -1052,23 +849,10 @@ export const aptaxVerifierAbi = [
   },
   {
     "inputs": [],
-    "name": "nextRequestId",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "registry",
     "outputs": [
       {
-        "internalType": "contract AptaxRegistry",
+        "internalType": "contract IAptaxRegistry",
         "name": "",
         "type": "address"
       }
@@ -1076,8 +860,4 @@ export const aptaxVerifierAbi = [
     "stateMutability": "view",
     "type": "function"
   }
-] as const satisfies Abi;
-
-export const aptaxRegistryViemAbi = aptaxRegistryAbi;
-export const aptaxMetricStoreViemAbi = aptaxMetricStoreAbi;
-export const aptaxVerifierViemAbi = aptaxVerifierAbi;
+] as const;
